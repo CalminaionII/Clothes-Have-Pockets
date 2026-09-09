@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<AssemblyName>clotheshavepockets</AssemblyName>
+		<Platforms>AnyCPU</Platforms>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Prefer32Bit>false</Prefer32Bit>
+
+		<!-- KEEP THE LINE NUMBERS, DROP THE PERSONAL PATH.
+
+		     The shipped .pdb is what puts file names and line numbers into a crash
+		     report, and that has been the whole diagnosis more than once. But without
+		     this the recorded source root is absolute, so every stranger's log would
+		     carry "E:\Game Mods\Improved Vintage Story\Clothes Have Pockets\...".
+
+		     PathMap rewrites it, so traces read "src\PocketInventory.cs:line 42" with
+		     nothing about this machine in front. Verify by reading the .pdb as bytes
+		     and grepping for a drive letter and the username - both should be absent. -->
+		<PathMap>$(MSBuildProjectDirectory)=.</PathMap>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="tools\**" />
+		<None Include="tools\**" />
+		<Compile Remove="backup\**" />
+		<None Include="backup\**" />
+		<Compile Remove="mods\**" />
+		<None Include="mods\**" />
+	</ItemGroup>
+
+	<!-- ASSETS ARE NOT BUILD OUTPUT. They live in mods\clotheshavepockets_<version>\assets\
+	     beside modinfo.json and modicon.png, and package2.py zips them from there. Only the
+	     dll, pdb and deps come out of bin\. One source per mod - the previous project had
+	     this split across two homes and it cost two separate mistakes in one evening. -->
+
+	<!-- NO 0Harmony REFERENCE, DELIBERATELY.
+
+	     The whole point of this rebuild is that it needs no Harmony: GuiDialog's OnOpened
+	     and OnClosed are public events, and GuiDialogCharacterBase is public API, so the
+	     panel attaches to vanilla dialogs without patching them. Leaving the reference out
+	     means we cannot quietly drift back into patching non-public client code. If a
+	     future change genuinely needs Harmony, add the reference in the same commit as a
+	     session-log entry saying what forced it. -->
+
+	<ItemGroup>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\Lib\Newtonsoft.Json.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="protobuf-net">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\Lib\protobuf-net.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="SkiaSharp">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\Lib\SkiaSharp.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Vintagestory">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\Vintagestory.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VintagestoryAPI">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\VintagestoryAPI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VintagestoryLib">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\VintagestoryLib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSSurvivalMod">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\Mods\VSSurvivalMod.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="VSEssentials">
+			<HintPath>..\..\..\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7\Mods\VSEssentials.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+</Project>
