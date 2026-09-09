@@ -1,0 +1,16 @@
+[
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "mannycaucasianclothing:itemtypes/wearable/seraph/lowerbody.json",
+		"dependsOn": [ { "modid": "mannycaucasianclothing" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "mannycaucasianclothing:itemtypes/wearable/seraph/upperbodyover.json",
+		"dependsOn": [ { "modid": "mannycaucasianclothing" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	}
+]

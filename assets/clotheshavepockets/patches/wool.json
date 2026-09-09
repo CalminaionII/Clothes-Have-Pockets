@@ -1,0 +1,16 @@
+[
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "wool:itemtypes/wearable/lowerbody.json",
+		"dependsOn": [ { "modid": "wool" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "wool:itemtypes/wearable/upperbodyover.json",
+		"dependsOn": [ { "modid": "wool" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	}
+]

@@ -1,0 +1,23 @@
+[
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "hanfu:itemtypes/mamianqun.json",
+		"dependsOn": [ { "modid": "hanfu" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "hanfu:itemtypes/hakama.json",
+		"dependsOn": [ { "modid": "hanfu" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "hanfu:itemtypes/ru.json",
+		"dependsOn": [ { "modid": "hanfu" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	}
+]

@@ -1,0 +1,16 @@
+[
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "temporaldoctor:itemtypes/clothes/lowerbody.json",
+		"dependsOn": [ { "modid": "temporaldoctor" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "temporaldoctor:itemtypes/clothes/upperbodyover.json",
+		"dependsOn": [ { "modid": "temporaldoctor" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	}
+]

@@ -1,0 +1,134 @@
+[
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/lowerbody.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "@.*-(grass|beggar)": {
+          "slots": 0
+        },
+        "*": {
+          "slots": 2
+        }
+      }
+    }
+  },
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/upperbodyover.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "@.*-(hidetunic|surgeon)": {
+          "slots": 1
+        },
+        "*": {
+          "slots": 2
+        }
+      }
+    }
+  },
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/villager/nadiya/lowerbody.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "*-fisher": {
+          "slots": 3
+        },
+        "*": {
+          "slots": 2
+        }
+      }
+    }
+  },
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/villager/nadiya/upperbodyover.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "@.*-(miner|miner-clean)": {
+          "slots": 0
+        },
+        "*": {
+          "slots": 2
+        }
+      }
+    }
+  },
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/waist.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "*-alchemist": {
+          "slots": 4
+        },
+        "*-merchant-belt": {
+          "slots": 2
+        },
+        "@.*-(wanderer|heavy-tool-belt|scribe)": {
+          "slots": 1
+        },
+        "*": {
+          "slots": 0
+        }
+      }
+    }
+  },
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/villager/nadiya/waist.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "*-alchemist": {
+          "slots": 3
+        },
+        "*-musician": {
+          "slots": 2
+        },
+        "@.*-(shepherd|peasant1|peasant2|barber)": {
+          "slots": 1
+        },
+        "*": {
+          "slots": 0
+        }
+      }
+    }
+  },
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/shoulder.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "@.*-(alchemist|blacksmith-apron|clockmaker-apron|apronblack|apronblue|apronbrown|aprongray|aprongreen|apronorange|apronpink|apronplain|apronpurple|apronred|apronwhite|apronyellow)": {
+          "slots": 1
+        },
+        "*": {
+          "slots": 0
+        }
+      }
+    }
+  },
+  {
+    "op": "addmerge",
+    "path": "/attributes",
+    "file": "game:itemtypes/wearable/seraph/villager/nadiya/shoulder.json",
+    "value": {
+      "clotheshavepocketsByType": {
+        "@.*-(barber|blacksmith|innkeeper)": {
+          "slots": 1
+        },
+        "*": {
+          "slots": 0
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,40 @@
+{
+	"Configuration": [
+		{
+			"ConfigFile": "ClothesHavePockets.json",
+			"ConfigLabel": "clotheshavepockets:config-title-client",
+			"ConfigSide": "Client",
+
+			"Settings": [
+				{
+					"Type": "Boolean",
+					"Label": "clotheshavepockets:config-open-with-inventory",
+					"Map": "OpenWithInventory"
+				},
+				{
+					"Type": "Boolean",
+					"Label": "clotheshavepockets:config-unbind-with-immersive",
+					"Map": "UnbindFromInventoryWithImmersiveInventorySlots"
+				}
+			]
+		},
+		{
+			"ConfigFile": "ClothesHavePockets.json",
+			"ConfigLabel": "clotheshavepockets:config-title-server",
+			"ConfigSide": "Server",
+
+			"Settings": [
+				{
+					"Type": "Boolean",
+					"Label": "clotheshavepockets:config-drop-on-death",
+					"Map": "DropPocketsOnDeath"
+				},
+				{
+					"Type": "Boolean",
+					"Label": "clotheshavepockets:config-try-inventory-first",
+					"Map": "TryPlayerInventoryBeforeDropping"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,79 @@
+[
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/finetunic.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/seaspraycoat.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/cardigan.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/tailcoat.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/backlessgown.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 1 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/corsetdress.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 1 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/finegown.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 1 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/heavydress.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 1 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/maternitygown.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 1 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/summerdress.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 1 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "regalia:itemtypes/weddinggown.json",
+		"dependsOn": [ { "modid": "regalia" } ],
+		"value": { "clotheshavepockets": { "slots": 1 } }
+	}
+]

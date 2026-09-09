@@ -1,0 +1,58 @@
+[
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/lowerbody/pants-bluejeans.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/lowerbody/pants-mountaineer.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/upperbodyover/shirt-dustercanvas.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/upperbodyover/shirt-mountaineerfringed.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/upperbodyover/shirt-mountaineernonfringe.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/upperbodyover/shirt-suspendersleather.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/upperbodyover/shirt-suspenderslinen.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	},
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "americanfrontiersman:itemtypes/wearable/seraph/clothing/upperbodyover/shirt-suspendersrope.json",
+		"dependsOn": [ { "modid": "americanfrontiersman" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	}
+]

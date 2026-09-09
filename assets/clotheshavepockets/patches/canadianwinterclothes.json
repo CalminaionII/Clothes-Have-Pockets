@@ -1,0 +1,9 @@
+[
+	{
+		"op": "addmerge",
+		"path": "/attributes",
+		"file": "canadianwinterclothes:itemtypes/wearable/lowerbody.json",
+		"dependsOn": [ { "modid": "canadianwinterclothes" } ],
+		"value": { "clotheshavepockets": { "slots": 2 } }
+	}
+]

@@ -1,0 +1,12 @@
+{
+  "panel-title": "Pockets",
+  "hotkey-pockets": "Show Pockets",
+  "pocket-count": "Pockets: {0}",
+  "pocket-count-one": "Pockets: 1",
+  "config-title-client": "Clothes Have Pockets (Client)",
+  "config-title-server": "Clothes Have Pockets (Server)",
+  "config-open-with-inventory": "Open the Pockets panel with the inventory screen",
+  "config-unbind-with-immersive": "Unbind the panel automatically when Immersive Inventory Slots is installed",
+  "config-drop-on-death": "Drop pocket contents on death",
+  "config-try-inventory-first": "Put pocket contents in your inventory before dropping them"
+}
