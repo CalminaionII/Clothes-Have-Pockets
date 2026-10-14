@@ -297,24 +297,10 @@ namespace ClothesHavePockets
             }
         }
 
-        /// <summary>
-        /// Drop the pockets where the player died - but only if the server wants that.
-        ///
-        /// CALLED BY THE ENGINE, not by this mod, because these are a player inventory now.
-        /// On 2026-09-07 that showed up as "drop on death isn't working": vanilla had
-        /// already emptied the slots before the mod's own PlayerDeath handler looked at
-        /// them, so it found nothing and said nothing. The handler was not broken, it was
-        /// second. This is where the setting has to be honoured, or DropPocketsOnDeath:
-        /// false silently stops meaning anything.
-        ///
-        /// base.DropAll is a real drop - it spawns item entities with the player's despawn
-        /// timer - so when the setting is on there is nothing to improve on.
-        /// </summary>
-        public override void DropAll(Vec3d pos, int maxStackSize = 0)
-        {
-            if (config != null && !config.DropPocketsOnDeath) return;
-
-            base.DropAll(pos, maxStackSize);
-        }
+        // No DropAll override. The engine calls it on death because this is a player
+        // inventory, and the server's `deathPunishment` world setting decides whether it is
+        // called at all - so the pockets follow the same rule as the backpack with no code
+        // here. There WAS an override honouring a DropPocketsOnDeath setting until
+        // 2026-09-12; see PocketConfig for why it went.
     }
 }

@@ -83,6 +83,18 @@ namespace ClothesHavePockets
         /// </summary>
         private int lastFilledCount;
 
+        /// <summary>
+        /// Where this player wants a garment's pocket contents to go when it comes off:
+        /// their own inventory first (true) or straight to the floor (false).
+        ///
+        /// PER PLAYER, NOT FROM THE SERVER'S CONFIG. It became the player's own setting on
+        /// 2026-09-12 - nothing about it needs a server to impose it - and a client-owned
+        /// setting lives in the CLIENT's file, which the server never reads. So the client
+        /// sends its value in a PocketPreferencesPacket on join and on every config reload,
+        /// and the mod system sets this. Defaults to true until the client has said.
+        /// </summary>
+        public bool HandBackToInventory = true;
+
         public PocketMirror(ICoreAPI api, IPlayer player, InventoryPockets inventory, InventoryBase characterInventory, PocketConfig config)
         {
             this.api = api;
@@ -359,6 +371,7 @@ namespace ClothesHavePockets
         private void HandOutPocketsOf(int garmentSlotId, ItemStack garment)
         {
             int handedBack = 0;
+            int dropped = 0;
 
             for (int index = 0; index < InventoryPockets.MaxPocketsPerGarment; index++)
             {
@@ -376,33 +389,38 @@ namespace ClothesHavePockets
                 slot.Itemstack = null;
                 slot.MarkDirty();
 
-                GiveOrDrop(stack);
-                handedBack++;
+                if (GiveOrDrop(stack)) handedBack++; else dropped++;
             }
 
             // SAID EVEN WHEN IT IS ZERO. Silence is what made drop-on-death look broken for
             // an hour on 2026-09-07: a line that only appears sometimes cannot be told apart
-            // from a handler that never ran at all.
+            // from a handler that never ran at all. And it says WHERE they went, because on
+            // 2026-09-12 a count alone could not show whether the per-player preference was
+            // being honoured. VerboseDebug, not Notification: it fires on every garment a
+            // player takes off, which is far too often for the server console. It is still
+            // in server-debug.log when a test needs it - Calm's call, 2026-09-12.
             api.Logger.VerboseDebug(
-                "[clotheshavepockets] handed {0} item(s) back to {1} as {2} came off",
-                handedBack, player.PlayerName, garment?.GetName());
+                "[clotheshavepockets] {0} came off {1}: {2} stack(s) to inventory, {3} dropped (HandBackToInventory={4})",
+                garment?.GetName(), player.PlayerName, handedBack, dropped, HandBackToInventory);
         }
 
-        private void GiveOrDrop(ItemStack stack)
+        /// <summary>Returns true if the whole stack went into the player's inventory.</summary>
+        private bool GiveOrDrop(ItemStack stack)
         {
-            if (stack == null || stack.StackSize <= 0) return;
+            if (stack == null || stack.StackSize <= 0) return true;
 
-            if (config.TryPlayerInventoryBeforeDropping)
+            if (HandBackToInventory)
             {
                 // TryGiveItemstack returns false when nothing fitted, and reduces the stack
                 // in place when only part of it did - so whatever is left after this is
                 // exactly what still needs dropping.
-                if (player.InventoryManager.TryGiveItemstack(stack, true) && stack.StackSize <= 0) return;
+                if (player.InventoryManager.TryGiveItemstack(stack, true) && stack.StackSize <= 0) return true;
             }
 
-            if (stack.StackSize <= 0) return;
+            if (stack.StackSize <= 0) return true;
 
             api.World.SpawnItemEntity(stack, player.Entity.Pos.XYZ);
+            return false;
         }
 
         // ------------------------------------------------------------------ migration

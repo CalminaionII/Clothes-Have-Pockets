@@ -68,8 +68,22 @@ namespace ClothesHavePockets
         /// registration" is wrong. Registration is what gives the type a name on the wire.
         /// Must happen on both sides: the server needs it to write, the client to read.
         /// </summary>
+        /// <summary>
+        /// One channel, one message: the client's per-player preferences. See
+        /// PocketPreferencesPacket for why a client-owned setting has to be sent at all.
+        /// </summary>
+        private const string ChannelName = "clotheshavepockets";
+
+        /// <summary>
+        /// Preferences that arrived before the player's mirror existed, or that need
+        /// re-applying when a mirror is rebuilt. Server side only. Keyed by player UID.
+        /// </summary>
+        private readonly Dictionary<string, bool> handBackPreference = new Dictionary<string, bool>();
+
         public override void Start(ICoreAPI api)
         {
+            api.Network.RegisterChannel(ChannelName).RegisterMessageType<PocketPreferencesPacket>();
+
             api.RegisterCollectibleBehaviorClass("clotheshavepocketsinfo", typeof(CollectibleBehaviorPocketInfo));
 
             // REQUIRED SINCE THE INVENTORY BECAME AN InventoryBasePlayer, 2026-09-07, and
@@ -262,10 +276,18 @@ namespace ClothesHavePockets
             //
             // NowPlaying means the player is fully loaded and in the world, which is the
             // earliest point their clothing is certainly there to be read.
-            ListenForConfigReloads(api);
+            //
+            // NO CONFIG RELOAD LISTENER ON THE SERVER, since 2026-09-12. Every setting is
+            // the player's own now and reaches the server by PocketPreferencesPacket, so the
+            // server's copy of the file governs nothing. Listening anyway produced a
+            // "Server: settings reloaded" line whenever an ADMIN saved - the managers only
+            // forward the event for players with controlserver - which read as if the
+            // server had changed something for everyone. It had not.
 
             api.Event.PlayerNowPlaying += OnServerPlayerNowPlaying;
             api.Event.PlayerDisconnect += OnServerPlayerLeave;
+
+            api.Network.GetChannel(ChannelName).SetMessageHandler<PocketPreferencesPacket>(OnPreferencesReceived);
 
             // NO PlayerDeath SUBSCRIPTION ANY MORE, 2026-09-07. The pockets are a player
             // inventory now, so the ENGINE drops them on death and it does so before any
@@ -283,6 +305,26 @@ namespace ClothesHavePockets
         private void OnServerPlayerLeave(IServerPlayer player)
         {
             DetachInventory(player.PlayerUID);
+            handBackPreference.Remove(player.PlayerUID);
+        }
+
+        /// <summary>
+        /// The client said how it wants its pockets handled. Remembered per player and
+        /// pushed onto their mirror if it exists yet - the packet can arrive before
+        /// PlayerNowPlaying has built one, which is why AttachInventory applies it too.
+        /// </summary>
+        private void OnPreferencesReceived(IServerPlayer player, PocketPreferencesPacket packet)
+        {
+            handBackPreference[player.PlayerUID] = packet.HandBackToInventory;
+
+            if (mirrors.TryGetValue(player.PlayerUID, out PocketMirror mirror))
+            {
+                mirror.HandBackToInventory = packet.HandBackToInventory;
+            }
+
+            player.Entity.Api.Logger.VerboseDebug(
+                "[clotheshavepockets] {0} prefers pocket contents {1} when a garment comes off",
+                player.PlayerName, packet.HandBackToInventory ? "handed back" : "dropped");
         }
 
         // ------------------------------------------------------------------ client
@@ -341,8 +383,7 @@ namespace ClothesHavePockets
 
             bool immersiveSlotsInstalled = capi.ModLoader.IsModEnabled(ImmersiveInventorySlotsModId);
 
-            attachedToInventory = config.OpenWithInventory
-                && !(immersiveSlotsInstalled && config.UnbindFromInventoryWithImmersiveInventorySlots);
+            ApplyPanelAttachment();
 
             if (immersiveSlotsInstalled)
             {
@@ -352,11 +393,7 @@ namespace ClothesHavePockets
                     attachedToInventory ? "still attached to the inventory by config" : "unbound from the inventory");
             }
 
-            if (attachedToInventory)
-            {
-                AttachToVanillaInventoryDialog();
-                panel.ParentDialog = vanillaInventoryDialog;
-            }
+            SendPreferences();
 
             // Putting a pocketed garment ON while the inventory is already open has to
             // bring the panel back. Without this the panel only ever opens at the moment
@@ -369,6 +406,49 @@ namespace ClothesHavePockets
             // rebuilt when it does. Polling once a second is enough - it only matters at
             // human speed, and the check is a single integer comparison when nothing moved.
             clientTickListenerId = capi.Event.RegisterGameTickListener(OnClientTick, 1000);
+        }
+
+        /// <summary>
+        /// Tell the server what this client wants done with its pockets. Once on entering
+        /// the world, and again on every config reload so a change applies live.
+        /// </summary>
+        private void SendPreferences()
+        {
+            capi?.Network.GetChannel(ChannelName)?.SendPacket(new PocketPreferencesPacket
+            {
+                HandBackToInventory = config.TryPlayerInventoryBeforeDropping,
+            });
+        }
+
+        /// <summary>
+        /// Attach the panel to the vanilla inventory dialog, or detach it, to match the
+        /// config as it stands NOW. Idempotent, so it is safe to call from a reload as
+        /// well as from LevelFinalize: `vanillaInventoryDialog` being non-null IS the
+        /// "subscribed" state, and the subscribe and unsubscribe are the only two places
+        /// that set it. Double-subscribing that dialog is the bug that took this panel
+        /// down before, and this is the one gate that prevents it.
+        /// </summary>
+        private void ApplyPanelAttachment()
+        {
+            if (panel == null) return;
+
+            bool immersiveSlotsInstalled = capi.ModLoader.IsModEnabled(ImmersiveInventorySlotsModId);
+
+            attachedToInventory = config.OpenWithInventory
+                && !(immersiveSlotsInstalled && config.UnbindFromInventoryWithImmersiveInventorySlots);
+
+            if (attachedToInventory && vanillaInventoryDialog == null)
+            {
+                AttachToVanillaInventoryDialog();
+                panel.ParentDialog = vanillaInventoryDialog;
+            }
+            else if (!attachedToInventory && vanillaInventoryDialog != null)
+            {
+                vanillaInventoryDialog.OnOpened -= OnVanillaInventoryOpened;
+                vanillaInventoryDialog.OnClosed -= OnVanillaInventoryClosed;
+                vanillaInventoryDialog = null;
+                panel.ParentDialog = null;
+            }
         }
 
         /// <summary>
@@ -530,16 +610,26 @@ namespace ClothesHavePockets
         private const string ImmConfigChangedEvent = "imm.clotheshavepockets";
 
         /// <summary>
-        /// Pick up config changes made in game, without a restart.
+        /// The event ConfigKit raises after it has written our config file, on the side that
+        /// wrote it. The server also gets a copy forwarded from the client BEFORE its own
+        /// write - see ListenForConfigReloads for how that is handled.
+        /// </summary>
+        private const string ConfigKitConfigSavedEvent = "configkit:clotheshavepockets:config-saved";
+
+        /// <summary>ConfigLib's equivalent - ConfigKit is its fork and kept the scheme.</summary>
+        private const string ConfigLibConfigSavedEvent = "configlib:clotheshavepockets:config-saved";
+
+        /// <summary>
+        /// Pick up config changes made in game, without a restart - from Integrated Mod
+        /// Manager, ConfigKit or ConfigLib, whichever is installed.
         ///
-        /// NO DEPENDENCY ON IMM, AND NONE IS NEEDED. `RegisterEventBusListener` is vanilla
+        /// NO DEPENDENCY ON EITHER, AND NONE IS NEEDED. `RegisterEventBusListener` is vanilla
         /// API and an event nobody raises simply never fires, so this costs nothing at all
         /// when Integrated Mod Manager is not installed. That is the same bargain the rest
         /// of the mod makes - it reacts to other mods being present, it never requires them.
         ///
-        /// Registered on BOTH sides because the settings are split across them: dropping is
-        /// decided by the server, the panel by the client, and each side has its own copy of
-        /// the file.
+        /// Client side only: every setting is the player's own, and the one the server
+        /// acts on reaches it by packet, not by file.
         /// </summary>
         private void ListenForConfigReloads(ICoreAPI api)
         {
@@ -548,12 +638,21 @@ namespace ClothesHavePockets
             // started last and the other side's reload would log - or write - as the wrong
             // one. That exact class of bug turned up four times in one audit on the previous
             // project, which is why `mirrors` is instance state with a comment saying so.
-            api.Event.RegisterEventBusListener(
+            //
+            // CLIENT ONLY, since 2026-09-12 - see StartServerSide for why the server no
+            // longer listens. All three managers raise their event on the client AFTER
+            // writing the file, so the reload can run at once. (If a server-owned setting
+            // ever comes back, the server side needs the deferred, re-arming reload that
+            // Universal Display uses: the managers forward the client's event to the server
+            // BEFORE the server has written its own file.)
+            EventBusListenerDelegate onConfigChanged =
                 delegate (string eventName, ref EnumHandling handling, IAttribute data)
                 {
                     ReloadConfig(api);
-                },
-                0.5, ImmConfigChangedEvent);
+                };
+            api.Event.RegisterEventBusListener(onConfigChanged, 0.5, ImmConfigChangedEvent);
+            api.Event.RegisterEventBusListener(onConfigChanged, 0.5, ConfigKitConfigSavedEvent);
+            api.Event.RegisterEventBusListener(onConfigChanged, 0.5, ConfigLibConfigSavedEvent);
         }
 
         private void ReloadConfig(ICoreAPI api)
@@ -565,18 +664,21 @@ namespace ClothesHavePockets
             // reading the old settings and the reload would silently do nothing.
             if (!config.ReloadInPlace(api)) return;
 
-            // WHAT ACTUALLY TAKES EFFECT, said plainly rather than implied. The two dropping
-            // settings are read at the moment they are used - a death, a garment coming off -
-            // so they are live from now on. The two panel settings are read ONCE, when the
-            // panel is wired to the vanilla inventory dialog at LevelFinalize; changing them
-            // live would mean subscribing and unsubscribing from that dialog's events at
-            // runtime, and double-subscribing it is exactly the class of bug that has taken
-            // this panel down before. Not worth it for a setting changed once in a session.
+            // ALL THREE ARE LIVE, since 2026-09-12. The hand-back preference is re-sent to
+            // the server, and the panel is re-attached or detached to match. The re-attach
+            // used to be refused for fear of double-subscribing the inventory dialog; see
+            // ApplyPanelAttachment for the one gate that makes it safe.
+            if (api.Side == EnumAppSide.Client)
+            {
+                ApplyPanelAttachment();
+                SendPreferences();
+            }
+
             api.Logger.Notification(
-                "[clotheshavepockets] {0}: settings reloaded. Dropping settings are live now; "
-                + "OpenWithInventory and UnbindFromInventoryWithImmersiveInventorySlots need a "
-                + "world reload to take effect.",
-                api.Side);
+                "[clotheshavepockets] {0}: settings reloaded. TryPlayerInventoryBeforeDropping={1} "
+                + "OpenWithInventory={2} UnbindFromInventoryWithImmersiveInventorySlots={3}",
+                api.Side, config.TryPlayerInventoryBeforeDropping,
+                config.OpenWithInventory, config.UnbindFromInventoryWithImmersiveInventorySlots);
         }
 
         private InventoryPockets AttachInventory(IPlayer player, ICoreAPI api)
@@ -681,6 +783,11 @@ namespace ClothesHavePockets
             // would otherwise leave the previous mirror subscribed to their clothing.
             DetachInventory(player.PlayerUID);
             mirrors[player.PlayerUID] = new PocketMirror(api, player, inventory, characterInventory, config);
+
+            if (api.Side == EnumAppSide.Server && handBackPreference.TryGetValue(player.PlayerUID, out bool handBack))
+            {
+                mirrors[player.PlayerUID].HandBackToInventory = handBack;
+            }
 
             return inventory;
         }

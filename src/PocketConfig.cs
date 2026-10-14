@@ -14,7 +14,10 @@ namespace ClothesHavePockets
     public class PocketConfig
     {
         /// <summary>
-        /// Where a pocket's contents go when the garment comes off.
+        /// Where a pocket's contents go when the garment comes off. THE PLAYER'S OWN
+        /// SETTING since 2026-09-12: read on the client and sent to the server in a
+        /// PocketPreferencesPacket, so each player gets their own answer. The value in the
+        /// server's file is not used for anything.
         ///
         /// **true** - try the player's own inventory first, and drop only what does not
         /// fit. Loses far fewer items to someone changing clothes over water or a ravine.
@@ -23,22 +26,12 @@ namespace ClothesHavePockets
         /// </summary>
         public bool TryPlayerInventoryBeforeDropping = true;
 
-        /// <summary>
-        /// Whether pocket contents drop when the player dies.
-        ///
-        /// **true** - they drop at the death spot with everything else, which is the point:
-        /// vanilla leaves your WORN clothing on your body when you die, so without this the
-        /// pockets are four slots that survive a death the rest of your inventory does not.
-        /// Calm's call, 2026-08-18, on seeing it happen on the test server: "it should drop
-        /// on death as can be overpowered".
-        ///
-        /// **false** - contents ride through death with the clothing.
-        ///
-        /// A SERVER RUNNING "keep your items on death" SHOULD SET THIS FALSE. The mod cannot
-        /// read that intent reliably, so it is a setting rather than a guess - on a server
-        /// where nothing else drops, pockets alone dropping would be a nasty surprise.
-        /// </summary>
-        public bool DropPocketsOnDeath = true;
+        // DropPocketsOnDeath is GONE - removed 2026-09-12, Calm's call. The pockets are a real
+        // player inventory, so the server's own `/worldconfig deathPunishment` (keep / drop)
+        // governs them exactly as it governs the backpack; a separate toggle only ever added
+        // "everything drops except the pockets" and read like a keep-inventory switch it
+        // was not. Old config files that still carry the key load fine - unknown keys are
+        // ignored.
 
         /// <summary>
         /// Whether the Pockets panel opens and closes together with the inventory screen.
@@ -126,7 +119,6 @@ namespace ClothesHavePockets
             if (fresh == null) return false;
 
             TryPlayerInventoryBeforeDropping = fresh.TryPlayerInventoryBeforeDropping;
-            DropPocketsOnDeath = fresh.DropPocketsOnDeath;
             OpenWithInventory = fresh.OpenWithInventory;
             UnbindFromInventoryWithImmersiveInventorySlots = fresh.UnbindFromInventoryWithImmersiveInventorySlots;
 
