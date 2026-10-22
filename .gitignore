@@ -1,0 +1,6 @@
+# Build output and game files - never commit these
+bin/
+obj/
+*.dll
+*.pdb
+gamepath.props

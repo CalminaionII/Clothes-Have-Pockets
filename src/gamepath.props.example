@@ -1,0 +1,8 @@
+<!-- Your PC's Vintage Story folder: the one that contains VintagestoryAPI.dll (with Lib and Mods folders inside).
+     Copy this file to "gamepath.props" (same folder, next to ClothesHavePockets.csproj), then change the path below to yours if it is different.
+     gamepath.props is in .gitignore, so your own path never goes to GitHub. -->
+<Project>
+	<PropertyGroup>
+		<VintageStoryPath>E:\Games\Vintage Story\Wax Light Launcher\Wax Light Info\versions\1.22.7</VintageStoryPath>
+	</PropertyGroup>
+</Project>
