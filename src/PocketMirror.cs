@@ -210,11 +210,6 @@ namespace ClothesHavePockets
                     currentGarments[i] = worn;
                 }
 
-                // SERVER ONLY. Removal detection needs to identify a garment across a
-                // change, and the client cannot - every stack it holds is replaced on each
-                // sync. The client's slots arrive from the server already correct.
-                if (api.Side == EnumAppSide.Server) HandleRemovedGarments(currentGarments);
-
                 var mapping = new int[InventoryPockets.TotalSlots];
                 for (int i = 0; i < mapping.Length; i++) mapping[i] = -1;
 
@@ -240,6 +235,16 @@ namespace ClothesHavePockets
                 }
 
                 inventory.SetLiveMapping(mapping);
+
+                // SERVER ONLY. Removal detection needs to identify a garment across a
+                // change, and the client cannot - every stack it holds is replaced on each
+                // sync. The client's slots arrive from the server already correct.
+                //
+                // AFTER the new mapping, so a garment that came off no longer owns its pockets
+                // when they are emptied. Handed back before, TryGiveItemstack could put an item
+                // straight into one of those still-live slots, and only the orphan sweep below
+                // got it out again. Its slots are found by address, so the old mapping is not needed.
+                if (api.Side == EnumAppSide.Server) HandleRemovedGarments(currentGarments);
 
                 lastSeenGarments.Clear();
                 foreach (var pair in currentGarments) lastSeenGarments[pair.Key] = pair.Value;
@@ -364,9 +369,9 @@ namespace ClothesHavePockets
         /// just come off, and empty those slots.
         ///
         /// The slots are found by ADDRESS now - a garment worn in character slot 3 always
-        /// owns pocket slots 15 to 19 - rather than by scanning the inventory for a matching
-        /// owner. The mapping has not been recomputed yet when this runs, and with fixed
-        /// addresses it does not need to have been.
+        /// owns pocket slots 30 to 39 - rather than by scanning the inventory for a matching
+        /// owner. The new mapping is already in place when this runs (so the garment no longer
+        /// owns these slots); the fixed addresses are what still find them.
         /// </summary>
         private void HandOutPocketsOf(int garmentSlotId, ItemStack garment)
         {

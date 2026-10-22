@@ -183,7 +183,7 @@ namespace ClothesHavePockets
         private void Compose()
         {
             // THE GRID IS COMPOSED OVER THE LIVE SLOTS ONLY. The inventory itself is a
-            // fixed 100 slots so the engine can address updates by index without the count
+            // fixed 200 slots so the engine can address updates by index without the count
             // moving under it, but the player must see two boxes in trousers, not a
             // hundred. vanilla's AddItemSlotGrid takes an explicit slot id list for exactly
             // this.

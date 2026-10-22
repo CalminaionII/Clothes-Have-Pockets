@@ -777,11 +777,14 @@ namespace ClothesHavePockets
             // in the world and is only reachable while the window is up. These pockets
             // belong to the player and exist whether or not any window is open, so they
             // are opened once when the player is attached and stay open.
+            //
+            // Replace rather than accumulate, and BEFORE opening: a player rejoining without a
+            // clean disconnect would otherwise leave the previous mirror subscribed to their
+            // clothing - and that mirror's Dispose closes this same inventory, so detaching it
+            // after the open shut the pockets again and the server refused every click.
+            DetachInventory(player.PlayerUID);
             player.InventoryManager.OpenInventory(inventory);
 
-            // Replace rather than accumulate. A player rejoining without a clean disconnect
-            // would otherwise leave the previous mirror subscribed to their clothing.
-            DetachInventory(player.PlayerUID);
             mirrors[player.PlayerUID] = new PocketMirror(api, player, inventory, characterInventory, config);
 
             if (api.Side == EnumAppSide.Server && handBackPreference.TryGetValue(player.PlayerUID, out bool handBack))

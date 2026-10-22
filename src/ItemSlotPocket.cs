@@ -5,7 +5,7 @@ namespace ClothesHavePockets
     /// <summary>
     /// One pocket slot. Knows its own id, and refuses everything while it is INERT.
     ///
-    /// WHY A SLOT THAT KNOWS ITS OWN ID. The inventory is a fixed 100 slots, but only the
+    /// WHY A SLOT THAT KNOWS ITS OWN ID. The inventory is a fixed 200 slots, but only the
     /// ones backed by a worn garment are usable. Which those are changes every time the
     /// player dresses. Rather than swapping slot OBJECTS in and out - which is what broke
     /// the GUI repeatedly before, because a composed slot grid holds references to the
